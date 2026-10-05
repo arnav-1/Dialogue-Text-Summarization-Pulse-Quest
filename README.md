@@ -1,31 +1,58 @@
-# 💬 Dialogue Text Summarization Model
+# Dialogue Text Summarization
 
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
-![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat&logo=pytorch&logoColor=white)
-![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97_Hugging_Face-Transformers-orange)
+[![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Hugging Face](https://img.shields.io/badge/Hugging%20Face-Transformers-FFD21E?logo=huggingface&logoColor=111111)](https://huggingface.co/docs/transformers)
 
-## 📌 Overview
-This repository contains a sequence-to-sequence machine learning pipeline designed to generate highly accurate summaries of complex, multi-turn conversational dialogue. The project leverages the **Hugging Face Transformers** library to fine-tune a **BART** (Bidirectional and Auto-Regressive Transformers) model, adapting it specifically for the nuances of spoken-word transcripts.
+Fine-tuning experiments for generating concise summaries from multi-turn dialogue. The notebooks use a BART sequence-to-sequence model from Hugging Face and the `Seq2SeqTrainer` API.
 
-## ⚙️ Training & Optimization Architecture
-The training pipeline was engineered using the `Seq2SeqTrainer` API, focusing heavily on computational efficiency and model generalization:
-* **Mixed-Precision Training (FP16):** Implemented to significantly accelerate training times and reduce GPU memory footprint without sacrificing gradient accuracy.
-* **Regularization:** Utilized label smoothing and weight decay to heavily penalize overconfidence and prevent the model from overfitting to the training dialogue dataset.
+## Results
 
-## 🧠 Advanced Inference Pipeline
-Generative models frequently suffer from "looping" or repeating phrases. To ensure high-quality, human-readable summaries, the inference generation step utilizes a custom pipeline:
-* **5-Beam Search:** Explores multiple sequence probabilities simultaneously to calculate and select the most logically coherent final summary.
-* **Algorithmic Post-Processing:** Engineered custom n-gram penalty algorithms to actively detect and eliminate repetitive word sequences during generation.
+The best recorded validation result was **ROUGE-L: 56.43**. This value comes from the original experiment and is not automatically reproduced on every machine; training requires a compatible GPU and can take substantial time.
 
-## 📊 Performance Metrics
-The model was evaluated using standard automated summarization metrics, achieving highly competitive results on the validation set.
+The training setup includes:
 
-| Metric | Score |
-| :--- | :--- |
-| **ROUGE-L (Validation)** | **56.43** |
+- BART tokenization with truncated dialogue and summary sequences.
+- A reproducible train/validation split using seed `42`.
+- Mixed-precision training when supported by the available GPU.
+- Beam-search generation and ROUGE evaluation.
 
-## 📂 Repository Structure
-```text
-├── Best_Model.ipynb           # Finalized training, optimization, and inference pipeline
-├── Second_Best_Model.ipynb    # Alternative model architecture and hyperparameter experimentation
-└── README.md                  # Project documentation
+## Repository contents
+
+| Path | Description |
+| --- | --- |
+| `Best_Model.ipynb` | Final training, evaluation, and inference workflow. |
+| `Second_Best_Model.ipynb` | Alternative experiment with early stopping and a larger validation split. |
+| `train.csv`, `train_2.csv`, `train_3.csv` | Training dialogue-summary data. |
+| `test_2.csv` | Test dialogues used by the final workflow. |
+| `requirements.txt` | Python dependencies for running the notebooks. |
+| `Arnav Jaiswal Certificate - Pulse Quest 1st Place Final.pdf` | Project achievement certificate. |
+
+## Quick start
+
+1. Create and activate a Python 3.9+ environment.
+2. Install the dependencies:
+
+   ```bash
+   python -m pip install -r requirements.txt
+   ```
+
+3. Open `Best_Model.ipynb` in Jupyter or VS Code and run the cells in order.
+
+`Second_Best_Model.ipynb` expects the CSV files in the notebook working directory. `Best_Model.ipynb` was prepared for Kaggle and searches under `/kaggle/input`; when running locally, either upload the data to a matching Kaggle dataset or update its `get_path` helper to point to the repository directory.
+
+## Data format
+
+Training files must contain:
+
+- `dialogue`: the source conversation.
+- `summary`: the reference summary.
+
+The test file must contain a `dialogue` column. The notebooks remove incomplete rows and deduplicate training dialogues before tokenization.
+
+## Reproducibility notes
+
+- The base model is `linydub/bart-large-samsum`.
+- Results depend on the Transformers, PyTorch, CUDA, and GPU versions.
+- The notebooks download model weights and evaluation resources at runtime.
+- Generated checkpoints are written to the notebook runtime directory and are intentionally excluded from version control.

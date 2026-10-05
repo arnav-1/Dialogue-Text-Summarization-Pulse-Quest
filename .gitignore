@@ -1,0 +1,28 @@
+# Python and notebook artifacts
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.python-version
+
+# Local environments and secrets
+.venv/
+venv/
+env/
+*.env
+.env.*
+
+# Training outputs and caches
+wandb/
+outputs/
+checkpoints/
+model/
+bart_final_model/
+cache/
+*.safetensors
+*.pt
+*.pth
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
